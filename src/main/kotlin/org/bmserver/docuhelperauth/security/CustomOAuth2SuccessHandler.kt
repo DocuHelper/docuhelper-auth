@@ -1,5 +1,7 @@
 package org.bmserver.docuhelperauth.security
 
+import org.bmserver.docuhelperauth.security.user.Member
+import org.bmserver.docuhelperauth.security.user.MemberRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseCookie
 import org.springframework.http.server.reactive.ServerHttpResponse
@@ -15,6 +17,7 @@ import java.net.URI
 @Component
 class CustomOAuth2SuccessHandler(
     private val jwtUtil: JwtUtil,
+    private val memberRepository: MemberRepository,
 ) : ServerAuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(
         webFilterExchange: WebFilterExchange?,
@@ -30,15 +33,25 @@ class CustomOAuth2SuccessHandler(
             return response.setComplete()
         }
 
-        val jwtToken = jwtUtil.generateJwt(userEmail)
-
-        addAuthorizationHeader(response, jwtToken)
-        addJwtCookie(response, jwtToken)
-
         response.headers.location = URI("/")
         response.statusCode = HttpStatus.FOUND
 
-        return response.setComplete()
+        return memberRepository
+            .findMemberByEmail(userEmail)
+            .switchIfEmpty(
+                memberRepository.save(
+                    Member(uuid = null, email = userEmail),
+                ),
+            ).flatMap { member ->
+                member.uuid?.let {
+                    val jwtToken = jwtUtil.generateJwt(it, userEmail)
+                    addAuthorizationHeader(response, jwtToken)
+                    addJwtCookie(response, jwtToken)
+                    Mono.just(jwtToken)
+                } ?: Mono.error(IllegalStateException("Member UUID is null"))
+            }.flatMap {
+                response.setComplete()
+            }
     }
 
     private fun addAuthorizationHeader(
@@ -59,6 +72,7 @@ class CustomOAuth2SuccessHandler(
                 .secure(true) // HTTPS에서만 전송 → 보안 강화
                 .path("/") // 모든 경로에서 사용 가능
                 .sameSite("Strict") // CSRF 공격 방어
+                .domain(".bmserver.org")
                 .maxAge(24 * 60 * 60) // 24시간 유지
                 .build()
 
