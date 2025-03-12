@@ -68,11 +68,10 @@ class CustomOAuth2SuccessHandler(
         val responseCookie =
             ResponseCookie
                 .from("JWT_TOKEN", jwtToken)
-                .httpOnly(true)
+                .httpOnly(false)
                 .secure(true) // HTTPS에서만 전송 → 보안 강화
                 .path("/") // 모든 경로에서 사용 가능
                 .sameSite("Strict") // CSRF 공격 방어
-                .domain(".bmserver.org")
                 .maxAge(24 * 60 * 60) // 24시간 유지
                 .build()
 
