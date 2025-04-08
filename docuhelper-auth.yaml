@@ -34,6 +34,6 @@ spec:
     app: docuhelper-auth
   ports:
     - protocol: TCP
-      targetPort: 8080    # pod 포트
-      port: 8080          # 서비스 내부 포트
-      nodePort: 30000      # 서비스 외부 포트
+      targetPort: 8081    # pod 포트
+      port: 8081          # 서비스 내부 포트
+      nodePort: 30002      # 서비스 외부 포트
