@@ -5,7 +5,7 @@ metadata:
   name: docuhelper-auth-deployment
 
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: docuhelper-auth
@@ -16,10 +16,13 @@ spec:
     spec:
       containers:
         - name: docuhelper-auth-container
-          image: docker.bmserver.org/docuhelper-auth
+          image: docker.bmserver.org/docuhelper-auth:$IMAGE_TAG
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: docuhelper-configmap-prod
 ---
 
 apiVersion: v1

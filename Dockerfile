@@ -17,4 +17,4 @@ RUN chmod +x gradlew
 
 RUN sh gradlew build --warning-mode all
 
-ENTRYPOINT ["java", "-jar", "build/libs/docuhelper-auth-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT sh -c 'java -jar $(find build/libs -name "*.jar" | grep -v "plain" | head -n 1)'
