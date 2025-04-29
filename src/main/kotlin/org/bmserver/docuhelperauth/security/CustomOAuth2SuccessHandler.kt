@@ -44,7 +44,7 @@ class CustomOAuth2SuccessHandler(
                 ),
             ).flatMap { member ->
                 member.uuid?.let {
-                    val jwtToken = jwtUtil.generateJwt(it, userEmail)
+                    val jwtToken = jwtUtil.generateJwt(it, userEmail, member.role)
                     addAuthorizationHeader(response, jwtToken)
                     addJwtCookie(response, jwtToken)
                     Mono.just(jwtToken)

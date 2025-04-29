@@ -5,3 +5,6 @@ CREATE TABLE IF NOT EXISTS public.member
 );
 
 
+ALTER TABLE public.member
+    ADD IF NOT EXISTS role VARCHAR;
+

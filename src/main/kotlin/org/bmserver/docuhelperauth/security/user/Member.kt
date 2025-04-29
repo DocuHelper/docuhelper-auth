@@ -6,4 +6,5 @@ import java.util.UUID
 class Member(
     @Id var uuid: UUID?,
     val email: String,
+    val role: Role = Role.FREE,
 )

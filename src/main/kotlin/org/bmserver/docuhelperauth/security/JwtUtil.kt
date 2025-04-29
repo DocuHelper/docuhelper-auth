@@ -2,6 +2,7 @@ package org.bmserver.docuhelperauth.security
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
+import org.bmserver.docuhelperauth.security.user.Role
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.util.Date
@@ -23,6 +24,7 @@ class JwtUtil {
     fun generateJwt(
         uuid: UUID,
         email: String,
+        role: Role
     ): String =
         Jwts
             .builder()
@@ -30,6 +32,7 @@ class JwtUtil {
             .claims(
                 mapOf(
                     "email" to email,
+                    "role" to role
                 ),
             ).issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1시간 후 만료
