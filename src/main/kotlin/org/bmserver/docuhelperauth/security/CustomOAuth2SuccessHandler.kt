@@ -34,7 +34,8 @@ class CustomOAuth2SuccessHandler(
         }
 
         response.headers.location = URI("/")
-        response.statusCode = HttpStatus.FOUND
+//        response.statusCode = HttpStatus.FOUND
+        response.statusCode = HttpStatus.OK
 
         return memberRepository
             .findMemberByEmail(userEmail)
