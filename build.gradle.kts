@@ -30,6 +30,9 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    // https://mvnrepository.com/artifact/com.google.api-client/google-api-client
+    implementation("com.google.api-client:google-api-client:2.7.2")
+
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")

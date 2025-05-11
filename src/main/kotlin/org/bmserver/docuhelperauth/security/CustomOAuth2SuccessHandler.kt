@@ -18,6 +18,7 @@ import java.net.URI
 class CustomOAuth2SuccessHandler(
     private val jwtUtil: JwtUtil,
     private val memberRepository: MemberRepository,
+    private val authService: AuthService
 ) : ServerAuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(
         webFilterExchange: WebFilterExchange?,
@@ -36,22 +37,12 @@ class CustomOAuth2SuccessHandler(
         response.headers.location = URI("/")
         response.statusCode = HttpStatus.FOUND
 
-        return memberRepository
-            .findMemberByEmail(userEmail)
-            .switchIfEmpty(
-                memberRepository.save(
-                    Member(uuid = null, email = userEmail),
-                ),
-            ).flatMap { member ->
-                member.uuid?.let {
-                    val jwtToken = jwtUtil.generateJwt(it, userEmail, member.role)
-                    addAuthorizationHeader(response, jwtToken)
-                    addJwtCookie(response, jwtToken)
-                    Mono.just(jwtToken)
-                } ?: Mono.error(IllegalStateException("Member UUID is null"))
-            }.flatMap {
-                response.setComplete()
-            }
+        return authService.generateJwtToken(userEmail)
+            .map { token ->
+                addAuthorizationHeader(response, token)
+                addJwtCookie(response, token)
+                token
+            }.flatMap { response.setComplete() }
     }
 
     private fun addAuthorizationHeader(
